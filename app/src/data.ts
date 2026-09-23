@@ -1,6 +1,9 @@
 import type { LucideIcon } from 'lucide-react';
 import { Atom, DollarSign, Globe, Rocket, Scale, Store } from 'lucide-react';
 
+// Vite's base path: '/' locally, '/investorpersona/' on GitHub Pages without a custom domain.
+const BASE = import.meta.env.BASE_URL;
+
 export type PersonaId = 'buffett' | 'wood' | 'dalio' | 'lynch' | 'simons' | 'templeton';
 
 export interface Trait { label: string; pct: number }
@@ -21,7 +24,7 @@ export interface Persona {
 export interface Question { text: string; options: { persona: PersonaId; label: string }[] }
 
 export const PERSONAS: Persona[] = [
-  { id: 'buffett', name: 'Warren Buffett', shortName: 'Value Monk', archetype: 'The Value Monk', icon: DollarSign, compatibility: 88, charImage: '/personas/buffett.png', headImage: '/personas/buffett-head.png',
+  { id: 'buffett', name: 'Warren Buffett', shortName: 'Value Monk', archetype: 'The Value Monk', icon: DollarSign, compatibility: 88, charImage: `${BASE}personas/buffett.png`, headImage: `${BASE}personas/buffett-head.png`,
     resultCopy: "You view wealth creation as a marathon of patient compounding, not a sprint of speculation. Like Warren Buffett, you instinctively value durable competitive moats, cash-flow stability, and pricing power over short-term market trends. True financial freedom comes from holding great businesses at fair prices and letting time do the heavy lifting.",
     traits: [{label:'Patience Index',pct:95},{label:'Capital Discipline',pct:90},{label:'Moat Bias',pct:88}],
     portfolio: [
@@ -29,7 +32,7 @@ export const PERSONAS: Persona[] = [
       {asset:'Total US Broad Market',weight:35,ticker:'VTI',role:'Low-cost coverage across all US market caps',barColor:'var(--color-neutral-500)'},
       {asset:'Short-Term Treasury Yield',weight:20,ticker:'SGOV',role:'Capital preservation and dry powder',barColor:'var(--color-neutral-300)'},
     ]},
-  { id: 'wood', name: 'Cathie Wood', shortName: 'Disruption Prophet', archetype: 'The Disruption Prophet', icon: Rocket, compatibility: 93, charImage: '/personas/wood.png', headImage: '/personas/wood-head.png',
+  { id: 'wood', name: 'Cathie Wood', shortName: 'Disruption Prophet', archetype: 'The Disruption Prophet', icon: Rocket, compatibility: 93, charImage: `${BASE}personas/wood.png`, headImage: `${BASE}personas/wood-head.png`,
     resultCopy: "You see the financial world through the lens of exponential technology and future shifts. Like Cathie Wood, short-term paper volatility doesn't intimidate you if it buys early access to paradigm-shifting innovation — AI, robotics, genomics, and decentralized networks. You invest where the world is going, not where it has been.",
     traits: [{label:'Innovation Conviction',pct:98},{label:'High-Beta Tolerance',pct:90},{label:'Exponential Vision',pct:92}],
     portfolio: [
@@ -38,7 +41,7 @@ export const PERSONAS: Persona[] = [
       {asset:'Semiconductors & Hardware',weight:20,ticker:'SMH',role:'Foundational hardware powering global tech',barColor:'var(--color-neutral-500)'},
       {asset:'Digital Store of Value',weight:15,ticker:'IBIT',role:'Direct spot exposure to digital asset networks',barColor:'var(--color-neutral-300)'},
     ]},
-  { id: 'dalio', name: 'Ray Dalio', shortName: 'Macro Architect', archetype: 'The Macro Architect', icon: Scale, compatibility: 91, charImage: '/personas/dalio.png', headImage: '/personas/dalio-head.png',
+  { id: 'dalio', name: 'Ray Dalio', shortName: 'Macro Architect', archetype: 'The Macro Architect', icon: Scale, compatibility: 91, charImage: `${BASE}personas/dalio.png`, headImage: `${BASE}personas/dalio-head.png`,
     resultCopy: "You approach investing as a complex, interconnected machine governed by credit cycles, inflation shifts, and structural macro trends. Like Ray Dalio, your priority is risk parity and radical diversification — a balanced, All-Weather portfolio engineered to hold up across every stage of the economic cycle.",
     traits: [{label:'Structural Balance',pct:96},{label:'Macro Discipline',pct:91},{label:'Inflation Defense',pct:87}],
     portfolio: [
@@ -47,7 +50,7 @@ export const PERSONAS: Persona[] = [
       {asset:'Hard Assets & Gold',weight:20,ticker:'GLD',role:'Store of value and macro crisis hedge',barColor:'var(--color-neutral-300)'},
       {asset:'Inflation-Protected Securities',weight:15,ticker:'TIP',role:'Treasury inflation-indexed protection',barColor:'var(--color-neutral-200)'},
     ]},
-  { id: 'lynch', name: 'Peter Lynch', shortName: 'Everyday Observer', archetype: 'The Everyday Observer', icon: Store, compatibility: 90, charImage: '/personas/lynch.png', headImage: '/personas/lynch-head.png',
+  { id: 'lynch', name: 'Peter Lynch', shortName: 'Everyday Observer', archetype: 'The Everyday Observer', icon: Store, compatibility: 90, charImage: `${BASE}personas/lynch.png`, headImage: `${BASE}personas/lynch-head.png`,
     resultCopy: "You believe the best research doesn't happen in boardrooms, but in daily life. Like Peter Lynch, you spot consumer shifts and brand loyalty in the real world long before institutional analysts catch on — investing in what you understand, in scalable growth engines with room to multiply.",
     traits: [{label:'Practical Observation',pct:94},{label:'Mid-Cap Growth Bias',pct:89},{label:'Fundamental Clarity',pct:86}],
     portfolio: [
@@ -56,7 +59,7 @@ export const PERSONAS: Persona[] = [
       {asset:'Broad Market Base',weight:20,ticker:'VTI',role:'Core diversified US equity exposure',barColor:'var(--color-neutral-300)'},
       {asset:'High-Yield Liquidity Buffer',weight:10,ticker:'SGOV',role:'Flexible cash reserve for opportunities',barColor:'var(--color-neutral-200)'},
     ]},
-  { id: 'simons', name: 'Jim Simons', shortName: 'Quant Alchemist', archetype: 'The Quant Alchemist', icon: Atom, compatibility: 95, charImage: '/personas/simons.png', headImage: '/personas/simons-head.png',
+  { id: 'simons', name: 'Jim Simons', shortName: 'Quant Alchemist', archetype: 'The Quant Alchemist', icon: Atom, compatibility: 95, charImage: `${BASE}personas/simons.png`, headImage: `${BASE}personas/simons-head.png`,
     resultCopy: "You trust cold data and backtested models over gut feel or media narratives. Like Jim Simons, you view markets as a high-dimensional math problem best navigated by stripping emotion out of execution — systematic factor tilts and automated rebalancing that compound without hesitation.",
     traits: [{label:'Data Objectivity',pct:98},{label:'Factor Tilt Preference',pct:93},{label:'Systematic Execution',pct:95}],
     portfolio: [
@@ -65,7 +68,7 @@ export const PERSONAS: Persona[] = [
       {asset:'Momentum Factor',weight:25,ticker:'MTUM',role:'Systematic exposure to price momentum',barColor:'var(--color-neutral-500)'},
       {asset:'Managed Futures & Trend',weight:20,ticker:'DBMF',role:'Trend-following, uncorrelated alpha',barColor:'var(--color-neutral-300)'},
     ]},
-  { id: 'templeton', name: 'Sir John Templeton', shortName: 'Global Contrarian', archetype: 'The Global Contrarian', icon: Globe, compatibility: 92, charImage: '/personas/templeton.png', headImage: '/personas/templeton-head.png',
+  { id: 'templeton', name: 'Sir John Templeton', shortName: 'Global Contrarian', archetype: 'The Global Contrarian', icon: Globe, compatibility: 92, charImage: `${BASE}personas/templeton.png`, headImage: `${BASE}personas/templeton-head.png`,
     resultCopy: "You have the courage to buy when others are selling in panic, and to search where no one else is looking. Like Sir John Templeton, maximum pessimism creates maximum opportunity — hunting across borders and unloved sectors for deeply mispriced assets poised for mean reversion.",
     traits: [{label:'Contrarian Instincts',pct:96},{label:'Global Perspective',pct:92},{label:'Valuation Rigor',pct:88}],
     portfolio: [

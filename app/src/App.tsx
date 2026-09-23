@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { toBlob, toPng } from 'html-to-image';
+import { Analytics } from '@vercel/analytics/react';
 import { PERSONAS, QUESTIONS, type Persona, type PersonaId } from './data';
 
 type Screen = 'intro' | 'quiz' | 'loading' | 'result' | 'portfolio' | 'share';
@@ -148,6 +149,7 @@ export default function App() {
       {screen === 'share' && <Share match={match} onBack={() => setScreen('result')} />}
 
       {dialogOpen && <AdoptDialog match={match} onClose={() => setDialogOpen(false)} />}
+      <Analytics />
     </div>
   );
 }

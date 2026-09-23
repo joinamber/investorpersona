@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-d2375505-60da-4a0d-bd71-594a9bd4d0bc/styles.css">
+  <script src="_ds/modernist-d2375505-60da-4a0d-bd71-594a9bd4d0bc/_ds_bundle.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    body{margin:0}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</helmet>
+
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);display:flex;flex-direction:column;">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) var(--space-6);border-bottom:2px solid var(--color-divider);">
+    <div style="font-family:var(--font-heading);font-weight:700;letter-spacing:0.02em;font-size:18px;">HYPERPERSONA</div>
+    <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:14px;font-weight:600;color:var(--color-neutral-700);">Question {{ questionNumber }} / {{ totalQuestions }}</div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+    <div style="height:2px;background:var(--color-neutral-200);width:100%;">
+      <div style="height:2px;background:var(--color-accent);width:{{ progressPct }}%;transition:width .3s ease;"></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isIntro }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:var(--space-8) var(--space-6);max-width:640px;margin:0 auto;width:100%;">
+      <div style="font-size:14px;font-weight:700;letter-spacing:0.08em;color:var(--color-accent-700);text-transform:uppercase;margin-bottom:var(--space-3);">A Compatibility Test For Your Money</div>
+      <h1 style="font-family:var(--font-heading);font-weight:800;font-size:clamp(36px,7vw,64px);line-height:1.02;margin:0 0 var(--space-4) 0;">Who is your<br>investor <span style="color: var(--color-accent-2-500)">soulmate?</span></h1>
+      <p style="font-size:18px;line-height:1.5;color:var(--color-neutral-700);max-width:480px;margin:0 0 var(--space-6) 0;">Answer 8 lifestyle questions. We'll match you with the legendary investor whose philosophy mirrors yours — and hand you their portfolio.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0;border-top:2px solid var(--color-divider);border-bottom:2px solid var(--color-divider);margin-bottom:var(--space-6);">
+        <sc-for list="{{ personas }}" as="p" hint-placeholder-count="6">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:var(--space-2);padding:var(--space-4) var(--space-1);border-right:2px solid var(--color-divider);">
+            <i data-lucide="{{ p.icon }}" style="width:22px;height:22px;color:var(--color-text);"></i>
+            <div style="font-size:10px;font-weight:600;text-align:center;line-height:1.2;color:var(--color-neutral-700);">{{ p.shortName }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div>
+        <button class="btn btn-primary btn-block" onClick="{{ start }}" style="width: auto; padding: var(--space-3) var(--space-6); font-size: 16px; background-color: var(--color-accent-2-500)">
+          Take the Quiz →
+        </button>
+        <div style="font-size:13px;color:var(--color-neutral-600);margin-top:var(--space-3);">2 minutes · 8 questions · no signup required</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:var(--space-8) var(--space-6);max-width:640px;margin:0 auto;width:100%;" key="{{ questionNumber }}">
+      <h2 style="font-family:var(--font-heading);font-weight:800;font-size:clamp(24px,5vw,34px);line-height:1.15;margin:0 0 var(--space-6) 0;animation:fadeUp .35s ease;">{{ currentQuestion.text }}</h2>
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+        <sc-for list="{{ options }}" as="opt" hint-placeholder-count="4">
+          <button onClick="{{ opt.onClick }}" style="display:flex;align-items:flex-start;gap:var(--space-4);text-align:left;background:var(--color-bg);border:2px solid var(--color-divider);padding:var(--space-4);font-family:var(--font-body);font-size:16px;line-height:1.4;color:var(--color-text);cursor:pointer;" style-hover="border-color:var(--color-accent);background:var(--color-accent-100);">
+            <span style="flex:none;width:28px;height:28px;border:2px solid var(--color-text);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;">{{ opt.letter }}</span>
+            <span style="padding-top:2px;">{{ opt.label }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-8);gap:var(--space-5);">
+      <div style="width:56px;height:56px;border:3px solid var(--color-neutral-200);border-top-color:var(--color-accent);border-radius:50%;animation:spin 0.9s linear infinite;"></div>
+      <div style="font-family:var(--font-heading);font-size:22px;font-weight:700;">Finding your match…</div>
+      <div style="font-size:15px;color:var(--color-neutral-600);">Comparing you to {{ tickerName }}</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;padding:var(--space-8) var(--space-6);max-width:640px;margin:0 auto;width:100%;animation:fadeUp .4s ease;">
+      <div style="display:flex;align-items:center;gap:var(--space-5);margin-bottom:var(--space-6);">
+        <img src="{{ match.headImage }}" alt="{{ match.name }}" style="flex:none;width:96px;height:96px;border-radius:50%;object-fit:cover;box-shadow:var(--shadow-md);transform:rotate(-4deg);">
+        <div>
+          <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-600);margin-bottom:2px;">It's a match</div>
+          <div style="font-family:var(--font-heading);font-weight:800;font-size:28px;line-height:1.05;">{{ match.name }}</div>
+          <div style="font-size:15px;font-weight:600;color:var(--color-neutral-700);">{{ match.archetype }}</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:baseline;gap:var(--space-2);margin-bottom:var(--space-5);">
+        <span style="font-family:var(--font-heading);font-size:44px;font-weight:800;color:var(--color-neutral-800);">{{ match.compatibility }}%</span>
+        <span style="font-size:15px;font-weight:600;color:var(--color-neutral-600);">compatible</span>
+      </div>
+
+      <p style="font-size:17px;line-height:1.6;color:var(--color-neutral-800);margin:0 0 var(--space-6) 0;max-width:520px;">{{ match.resultCopy }}</p>
+
+      <div style="background:var(--color-neutral-100);padding:var(--space-5);margin-bottom:var(--space-6);">
+        <div style="font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--color-neutral-700);margin-bottom:var(--space-4);">Shared Traits</div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+          <sc-for list="{{ match.traits }}" as="trait" hint-placeholder-count="3">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-bottom:6px;">
+                <span>{{ trait.label }}</span><span>{{ trait.pct }}%</span>
+              </div>
+              <div style="height:6px;background:var(--color-neutral-300);width:100%;border-radius:3px;">
+                <div style="height:6px;background:var(--color-neutral-700);width:{{ trait.pct }}%;border-radius:3px;"></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+        <button class="btn btn-primary" onClick="{{ goPortfolio }}" style="padding:var(--space-3) var(--space-5);font-size:16px;">See My {{ match.name }}-Inspired Portfolio →</button>
+        <button class="btn btn-ghost" onClick="{{ goShare }}" style="padding:var(--space-3) var(--space-5);font-size:16px;">Share My Match</button>
+        <button onClick="{{ retake }}" style="background:none;border:none;font-size:14px;color:var(--color-neutral-600);text-decoration:underline;cursor:pointer;padding:var(--space-2) 0;align-self:flex-start;">Retake the quiz</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isPortfolio }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;padding:var(--space-8) var(--space-6);max-width:640px;margin:0 auto;width:100%;animation:fadeUp .35s ease;">
+      <button onClick="{{ backToResult }}" style="background:none;border:none;display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;padding:0;margin-bottom:var(--space-5);">
+        <i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Back to result
+      </button>
+      <h1 style="font-family:var(--font-heading);font-weight:800;font-size:clamp(26px,5vw,36px);line-height:1.1;margin:0 0 var(--space-5) 0;">Your {{ match.name }}-inspired portfolio</h1>
+
+      <div style="display:flex;width:100%;height:28px;margin-bottom:var(--space-6);border:2px solid var(--color-text);">
+        <sc-for list="{{ match.portfolio }}" as="row" hint-placeholder-count="4">
+          <div style="height:100%;width:{{ row.weight }}%;background:{{ row.barColor }};border-right:2px solid var(--color-bg);"></div>
+        </sc-for>
+      </div>
+
+      <table class="table" style="width:100%;margin-bottom:var(--space-6);">
+        <thead>
+          <tr><th>Asset Class</th><th>Weight</th><th>Ticker</th><th>Role</th></tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ match.portfolio }}" as="row" hint-placeholder-count="4">
+            <tr>
+              <td>{{ row.asset }}</td>
+              <td style="font-weight:700;">{{ row.weight }}%</td>
+              <td><span class="tag tag-outline">{{ row.ticker }}</span></td>
+              <td style="color:var(--color-neutral-700);">{{ row.role }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);">
+        <button class="btn btn-primary" onClick="{{ openDialog }}" style="padding:var(--space-3) var(--space-5);font-size:16px;">Adopt This Strategy &amp; Link Bank</button>
+        <button class="btn btn-ghost" onClick="{{ goShare }}" style="padding:var(--space-3) var(--space-5);font-size:16px;">Share My Match</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isShare }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:var(--space-8) var(--space-6);gap:var(--space-6);animation:fadeUp .35s ease;">
+      <button onClick="{{ backToResult }}" style="background:none;border:none;display:flex;align-items:center;gap:6px;align-self:flex-start;font-size:14px;font-weight:600;color:var(--color-neutral-700);cursor:pointer;padding:0;">
+        <i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Back to result
+      </button>
+
+      <div style="width:288px;aspect-ratio:9/16;background:var(--color-text);color:var(--color-bg);border:2px solid var(--color-text);display:flex;flex-direction:column;justify-content:space-between;padding:var(--space-6) var(--space-5);">
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">HYPERPERSONA · Investor Match</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:var(--space-4);width:100%;">
+          <div style="background:var(--color-bg);padding:var(--space-2);border:2px solid var(--color-bg);width:148px;">
+            <img src="{{ match.charImage }}" alt="{{ match.name }}" style="width:100%;display:block;">
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:var(--font-heading);font-weight:800;font-size:24px;line-height:1.1;">{{ match.name }}</div>
+            <div style="font-size:13px;font-weight:600;opacity:0.8;">{{ match.archetype }}</div>
+          </div>
+          <div style="font-size:44px;font-weight:800;color:var(--color-accent);line-height:1;">{{ match.compatibility }}%</div>
+        </div>
+        <div style="font-size:11px;opacity:0.7;">Find your investor soulmate → https://hyperpersona.cc/</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:var(--space-3);width:288px;">
+        <button class="btn btn-primary" style="padding:var(--space-3) var(--space-5);font-size:16px;">Download for Instagram Story</button>
+        <button class="btn btn-secondary" style="padding:var(--space-3) var(--space-5);font-size:16px;">Copy Link</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ dialogOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop">
+      <div class="dialog">
+        <div class="dialog-title">Strategy queued</div>
+        <div class="dialog-body">This is a prototype — in the live app, adopting {{ match.name }}'s strategy connects you with a preferred wealth manager to start investing.</div>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" onClick="{{ closeDialog }}">Close</button>
+          <button class="btn btn-primary" onClick="{{ closeDialog }}">Got it</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const PERSONAS = [
+  { id: 'buffett', name: 'Warren Buffett', shortName: 'Value Monk', archetype: 'The Value Monk', icon: 'dollar-sign', compatibility: 88, charImage: 'assets/personas/buffett.png', headImage: 'assets/personas/buffett-head.png',
+    resultCopy: "You view wealth creation as a marathon of patient compounding, not a sprint of speculation. Like Warren Buffett, you instinctively value durable competitive moats, cash-flow stability, and pricing power over short-term market trends. True financial freedom comes from holding great businesses at fair prices and letting time do the heavy lifting.",
+    traits: [{label:'Patience Index',pct:95},{label:'Capital Discipline',pct:90},{label:'Moat Bias',pct:88}],
+    portfolio: [
+      {asset:'Quality Dividend Growth',weight:45,ticker:'SCHD',role:'High-ROE, dividend-growing US moat businesses',barColor:'var(--color-accent)'},
+      {asset:'Total US Broad Market',weight:35,ticker:'VTI',role:'Low-cost coverage across all US market caps',barColor:'var(--color-neutral-500)'},
+      {asset:'Short-Term Treasury Yield',weight:20,ticker:'SGOV',role:'Capital preservation and dry powder',barColor:'var(--color-neutral-300)'},
+    ]},
+  { id: 'wood', name: 'Cathie Wood', shortName: 'Disruption Prophet', archetype: 'The Disruption Prophet', icon: 'rocket', compatibility: 93, charImage: 'assets/personas/wood.png', headImage: 'assets/personas/wood-head.png',
+    resultCopy: "You see the financial world through the lens of exponential technology and future shifts. Like Cathie Wood, short-term paper volatility doesn't intimidate you if it buys early access to paradigm-shifting innovation — AI, robotics, genomics, and decentralized networks. You invest where the world is going, not where it has been.",
+    traits: [{label:'Innovation Conviction',pct:98},{label:'High-Beta Tolerance',pct:90},{label:'Exponential Vision',pct:92}],
+    portfolio: [
+      {asset:'Large-Cap Tech & Innovation',weight:40,ticker:'QQQM',role:'Nasdaq-100 mega-cap AI and tech leaders',barColor:'var(--color-accent)'},
+      {asset:'Disruptive Tech & Genomics',weight:25,ticker:'ARKK',role:'High-growth disruptive innovation themes',barColor:'var(--color-accent-700)'},
+      {asset:'Semiconductors & Hardware',weight:20,ticker:'SMH',role:'Foundational hardware powering global tech',barColor:'var(--color-neutral-500)'},
+      {asset:'Digital Store of Value',weight:15,ticker:'IBIT',role:'Direct spot exposure to digital asset networks',barColor:'var(--color-neutral-300)'},
+    ]},
+  { id: 'dalio', name: 'Ray Dalio', shortName: 'Macro Architect', archetype: 'The Macro Architect', icon: 'scale', compatibility: 91, charImage: 'assets/personas/dalio.png', headImage: 'assets/personas/dalio-head.png',
+    resultCopy: "You approach investing as a complex, interconnected machine governed by credit cycles, inflation shifts, and structural macro trends. Like Ray Dalio, your priority is risk parity and radical diversification — a balanced, All-Weather portfolio engineered to hold up across every stage of the economic cycle.",
+    traits: [{label:'Structural Balance',pct:96},{label:'Macro Discipline',pct:91},{label:'Inflation Defense',pct:87}],
+    portfolio: [
+      {asset:'Global Total Equity Market',weight:30,ticker:'VT',role:'Complete global market-cap exposure',barColor:'var(--color-accent)'},
+      {asset:'Intermediate Treasuries & Bonds',weight:35,ticker:'BND',role:'Fixed income ballast for market shocks',barColor:'var(--color-neutral-500)'},
+      {asset:'Hard Assets & Gold',weight:20,ticker:'GLD',role:'Store of value and macro crisis hedge',barColor:'var(--color-neutral-300)'},
+      {asset:'Inflation-Protected Securities',weight:15,ticker:'TIP',role:'Treasury inflation-indexed protection',barColor:'var(--color-neutral-200)'},
+    ]},
+  { id: 'lynch', name: 'Peter Lynch', shortName: 'Everyday Observer', archetype: 'The Everyday Observer', icon: 'store', compatibility: 90, charImage: 'assets/personas/lynch.png', headImage: 'assets/personas/lynch-head.png',
+    resultCopy: "You believe the best research doesn't happen in boardrooms, but in daily life. Like Peter Lynch, you spot consumer shifts and brand loyalty in the real world long before institutional analysts catch on — investing in what you understand, in scalable growth engines with room to multiply.",
+    traits: [{label:'Practical Observation',pct:94},{label:'Mid-Cap Growth Bias',pct:89},{label:'Fundamental Clarity',pct:86}],
+    portfolio: [
+      {asset:'Consumer Discretionary Brands',weight:40,ticker:'XLY',role:'High-conviction consumer and retail leaders',barColor:'var(--color-accent)'},
+      {asset:'US Mid-Cap Growth Equities',weight:30,ticker:'VO',role:'Mid-sized companies with long growth runways',barColor:'var(--color-neutral-500)'},
+      {asset:'Broad Market Base',weight:20,ticker:'VTI',role:'Core diversified US equity exposure',barColor:'var(--color-neutral-300)'},
+      {asset:'High-Yield Liquidity Buffer',weight:10,ticker:'SGOV',role:'Flexible cash reserve for opportunities',barColor:'var(--color-neutral-200)'},
+    ]},
+  { id: 'simons', name: 'Jim Simons', shortName: 'Quant Alchemist', archetype: 'The Quant Alchemist', icon: 'atom', compatibility: 95, charImage: 'assets/personas/simons.png', headImage: 'assets/personas/simons-head.png',
+    resultCopy: "You trust cold data and backtested models over gut feel or media narratives. Like Jim Simons, you view markets as a high-dimensional math problem best navigated by stripping emotion out of execution — systematic factor tilts and automated rebalancing that compound without hesitation.",
+    traits: [{label:'Data Objectivity',pct:98},{label:'Factor Tilt Preference',pct:93},{label:'Systematic Execution',pct:95}],
+    portfolio: [
+      {asset:'US Quality Factor',weight:30,ticker:'QUAL',role:'High ROE, low-leverage balance sheet screen',barColor:'var(--color-accent)'},
+      {asset:'Small-Cap Value Factor',weight:25,ticker:'AVUV',role:'Fama-French small-cap value premium',barColor:'var(--color-accent-700)'},
+      {asset:'Momentum Factor',weight:25,ticker:'MTUM',role:'Systematic exposure to price momentum',barColor:'var(--color-neutral-500)'},
+      {asset:'Managed Futures & Trend',weight:20,ticker:'DBMF',role:'Trend-following, uncorrelated alpha',barColor:'var(--color-neutral-300)'},
+    ]},
+  { id: 'templeton', name: 'Sir John Templeton', shortName: 'Global Contrarian', archetype: 'The Global Contrarian', icon: 'globe', compatibility: 92, charImage: 'assets/personas/templeton.png', headImage: 'assets/personas/templeton-head.png',
+    resultCopy: "You have the courage to buy when others are selling in panic, and to search where no one else is looking. Like Sir John Templeton, maximum pessimism creates maximum opportunity — hunting across borders and unloved sectors for deeply mispriced assets poised for mean reversion.",
+    traits: [{label:'Contrarian Instincts',pct:96},{label:'Global Perspective',pct:92},{label:'Valuation Rigor',pct:88}],
+    portfolio: [
+      {asset:'International Total Market',weight:35,ticker:'VXUS',role:'Developed and emerging markets outside the US',barColor:'var(--color-accent)'},
+      {asset:'Small-Cap International Value',weight:25,ticker:'VSS',role:'Undervalued global small-cap equities',barColor:'var(--color-accent-700)'},
+      {asset:'US Deep Value Equities',weight:25,ticker:'VTV',role:'Low P/E, low price-to-book US value',barColor:'var(--color-neutral-500)'},
+      {asset:'Global Debt & Liquidity',weight:15,ticker:'BNDX',role:'Investment-grade international bonds',barColor:'var(--color-neutral-300)'},
+    ]},
+];
+
+const QUESTIONS = [
+  { text: "How do you choose a restaurant in a new city?", options: [
+    {persona:'buffett', label:"I go to the century-old local staple that's been packed every night for 40 years."},
+    {persona:'wood', label:"I hunt down the hyper-experimental pop-up trending on social media right now."},
+    {persona:'dalio', label:"I look for a balanced menu with options for everyone in my group, no exceptions."},
+    {persona:'lynch', label:"I follow the line of locals queuing around the block before tourist blogs catch on."},
+  ]},
+  { text: "What's your relationship with your phone upgrade cycle?", options: [
+    {persona:'templeton', label:"I keep the same phone until it dies — waiting for rock bottom is second nature."},
+    {persona:'simons', label:"I pre-order the newest flagship the moment the specs justify it."},
+    {persona:'dalio', label:"I get a reliable mid-tier phone on a structured contract — predictable, no surprises."},
+    {persona:'lynch', label:"I hunt for a refurbished premium model — 90% of the features at half the price."},
+  ]},
+  { text: "You're planning a two-week vacation. What's your itinerary style?", options: [
+    {persona:'simons', label:"A data-driven spreadsheet with contingencies for weather, traffic, and delays."},
+    {persona:'templeton', label:"One-way ticket to a destination most people are too nervous to visit right now."},
+    {persona:'buffett', label:"A quiet cabin, no cell service, a stack of books, and zero plans to change."},
+    {persona:'wood', label:"A high-energy tour through tech hubs, galleries, and the next big cultural scene."},
+  ]},
+  { text: "A viral debate breaks out online. What do you do?", options: [
+    {persona:'buffett', label:"Ignore it completely — most of it is noise designed to steal my attention."},
+    {persona:'lynch', label:"Read every comment — there's a real shift happening under the surface."},
+    {persona:'dalio', label:"Break down both sides objectively to find the incentives driving each camp."},
+    {persona:'templeton', label:"Take the side everyone's dismissing, on principle."},
+  ]},
+  { text: "What's your real motivation for building wealth?", options: [
+    {persona:'dalio', label:"Total independence — never having to answer to anyone, ever."},
+    {persona:'wood', label:"Funding the future I actually want to live in."},
+    {persona:'simons', label:"Solving the puzzle and optimizing my own performance score."},
+    {persona:'lynch', label:"Spotting what everyone else missed, and being proven right."},
+  ]},
+  { text: "A rumor about a hot stock is everywhere. What's your move?", options: [
+    {persona:'buffett', label:"I don't touch what I can't explain to a ten-year-old."},
+    {persona:'wood', label:"I dig in obsessively — this could be the next paradigm shift."},
+    {persona:'dalio', label:"I check it against my risk framework before I feel anything."},
+    {persona:'simons', label:"I trust the data and the backtest, not the noise."},
+  ]},
+  { text: "Your ideal weekend project?", options: [
+    {persona:'lynch', label:"Wandering a mall or market, noting which stores are always packed."},
+    {persona:'templeton', label:"Researching a country or asset everyone else is avoiding."},
+    {persona:'simons', label:"Building a spreadsheet model to optimize some part of my life."},
+    {persona:'wood', label:"Falling down a rabbit hole on the newest AI or biotech breakthrough."},
+  ]},
+  { text: "When making a big decision, what matters most?", options: [
+    {persona:'buffett', label:"Will I still be glad about this in ten years?"},
+    {persona:'dalio', label:"Have I stress-tested every possible outcome?"},
+    {persona:'templeton', label:"Is everyone avoiding this for the wrong reasons?"},
+    {persona:'lynch', label:"Does this match what I'm already seeing with my own eyes?"},
+  ]},
+];
+
+class Component extends DCLogic {
+  state = { screen: 'intro', qIndex: 0, scores: {}, selected: null, matchId: null, tickerIndex: 0, dialogOpen: false };
+
+  componentDidMount() { this.refreshIcons(); }
+  componentDidUpdate() { this.refreshIcons(); }
+  componentWillUnmount() { clearInterval(this.tickInterval); clearTimeout(this.loadTimeout); }
+  refreshIcons() { if (window.lucide) window.lucide.createIcons(); }
+
+  start = () => this.setState({ screen: 'quiz', qIndex: 0, scores: {}, selected: null });
+
+  selectAnswer = (personaId) => {
+    if (this.state.selected) return;
+    const scores = { ...this.state.scores };
+    scores[personaId] = (scores[personaId] || 0) + 1;
+    this.setState({ selected: personaId, scores });
+    setTimeout(() => {
+      const next = this.state.qIndex + 1;
+      if (next >= QUESTIONS.length) {
+        this.setState({ screen: 'loading', selected: null });
+        this.runLoading();
+      } else {
+        this.setState({ qIndex: next, selected: null });
+      }
+    }, 420);
+  };
+
+  runLoading() {
+    this.tickInterval = setInterval(() => {
+      this.setState(s => ({ tickerIndex: (s.tickerIndex + 1) % PERSONAS.length }));
+    }, 260);
+    this.loadTimeout = setTimeout(() => {
+      clearInterval(this.tickInterval);
+      this.setState({ screen: 'result', matchId: this.computeMatch() });
+    }, 2000);
+  }
+
+  computeMatch() {
+    const scores = this.state.scores;
+    let best = PERSONAS[0].id, bestCount = -1;
+    PERSONAS.forEach(p => { const c = scores[p.id] || 0; if (c > bestCount) { bestCount = c; best = p.id; } });
+    return best;
+  }
+
+  goPortfolio = () => this.setState({ screen: 'portfolio' });
+  goShare = () => this.setState({ screen: 'share' });
+  backToResult = () => this.setState({ screen: 'result' });
+  openDialog = () => this.setState({ dialogOpen: true });
+  closeDialog = () => this.setState({ dialogOpen: false });
+  retake = () => { clearInterval(this.tickInterval); clearTimeout(this.loadTimeout); this.setState({ screen: 'intro', qIndex: 0, scores: {}, selected: null, matchId: null, tickerIndex: 0, dialogOpen: false }); };
+
+  renderVals() {
+    const { screen, qIndex, selected, matchId, tickerIndex, dialogOpen } = this.state;
+    const currentQuestion = QUESTIONS[qIndex] || QUESTIONS[0];
+    const match = PERSONAS.find(p => p.id === matchId) || PERSONAS[0];
+    const options = currentQuestion.options.map((o, i) => ({
+      ...o,
+      letter: 'ABCD'[i],
+      onClick: () => this.selectAnswer(o.persona),
+    }));
+    return {
+      isIntro: screen === 'intro',
+      isQuiz: screen === 'quiz',
+      isLoading: screen === 'loading',
+      isResult: screen === 'result',
+      isPortfolio: screen === 'portfolio',
+      isShare: screen === 'share',
+      dialogOpen,
+      personas: PERSONAS,
+      currentQuestion,
+      options,
+      questionNumber: qIndex + 1,
+      totalQuestions: QUESTIONS.length,
+      progressPct: Math.round((qIndex / QUESTIONS.length) * 100),
+      tickerName: PERSONAS[tickerIndex].name,
+      match,
+      start: this.start,
+      goPortfolio: this.goPortfolio,
+      goShare: this.goShare,
+      backToResult: this.backToResult,
+      openDialog: this.openDialog,
+      closeDialog: this.closeDialog,
+      retake: this.retake,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

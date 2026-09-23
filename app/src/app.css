@@ -194,3 +194,10 @@
 .story-footer { font-size: 11px; opacity: 0.7; }
 .share-actions { width: 288px; }
 .share-error { font-size: 13px; color: var(--color-accent-700); margin: 0; }
+.save-sheet-body {
+  width: min(320px, 100%); display: flex; flex-direction: column; gap: var(--space-3);
+  padding: var(--space-4); background: var(--color-surface); box-shadow: var(--shadow-lg);
+}
+/* Let iOS show its native long-press menu (Save to Photos) on the image. */
+.save-sheet-body img { width: 100%; max-height: 65vh; object-fit: contain; -webkit-touch-callout: default; }
+.save-sheet-body p { margin: 0; font-size: 14px; color: var(--color-neutral-800); }

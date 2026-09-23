@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { toPng } from 'html-to-image';
+import { toBlob, toPng } from 'html-to-image';
 import { PERSONAS, QUESTIONS, type Persona, type PersonaId } from './data';
 
 type Screen = 'intro' | 'quiz' | 'loading' | 'result' | 'portfolio' | 'share';
@@ -12,6 +12,21 @@ const LOADING_MS = 2000;
 const TICKER_MS = 260;
 // The story card renders at 288px wide; export it at Instagram Story resolution (1080×1920).
 const STORY_PIXEL_RATIO = 1080 / 288;
+
+// Phones (no hover, coarse pointer) can't save an <a download> image to Photos, so they use the share sheet.
+const isTouchDevice = () => window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+// Render the card to a PNG File. iOS WebKit often drops images and fonts from the first
+// foreignObject render, so render once to warm it up and keep the second result.
+async function renderStoryFile(node: HTMLElement, name: string): Promise<File> {
+  await document.fonts.ready;
+  await Promise.all([...node.querySelectorAll('img')].map((img) => img.decode().catch(() => {})));
+  const opts = { pixelRatio: STORY_PIXEL_RATIO, cacheBust: true };
+  await toBlob(node, opts);
+  const blob = await toBlob(node, opts);
+  if (!blob) throw new Error('Empty render');
+  return new File([blob], name, { type: 'image/png' });
+}
 
 // Highest score wins; ties go to whichever persona is listed first.
 function computeMatch(scores: Scores): PersonaId {
@@ -258,21 +273,63 @@ function Share({ match, onBack }: { match: Persona; onBack: () => void }) {
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [touch] = useState(isTouchDevice);
+  // Mobile: pre-render as soon as the card is on screen, so the tap can open the share sheet
+  // immediately (iOS blocks navigator.share once the tap's user activation has expired).
+  const storyFile = useRef<Promise<File> | null>(null);
+  const [saveUrl, setSaveUrl] = useState<string | null>(null);
+  const fileName = `hyperpersona-${match.id}.png`;
 
-  const download = async () => {
+  useEffect(() => {
+    if (!touch || !cardRef.current) return;
+    const pending = renderStoryFile(cardRef.current, fileName);
+    pending.catch(() => {});
+    storyFile.current = pending;
+  }, [touch, fileName]);
+
+  useEffect(() => () => { if (saveUrl) URL.revokeObjectURL(saveUrl); }, [saveUrl]);
+
+  const downloadDesktop = async () => {
     if (!cardRef.current) return;
     setBusy(true); setError(null);
     try {
       const dataUrl = await toPng(cardRef.current, { pixelRatio: STORY_PIXEL_RATIO, cacheBust: true });
       const a = document.createElement('a');
       a.href = dataUrl;
-      a.download = `hyperpersona-${match.id}.png`;
+      a.download = fileName;
       a.click();
     } catch {
       setError("Couldn't create the image. Try a screenshot instead.");
     } finally {
       setBusy(false);
     }
+  };
+
+  const downloadMobile = async () => {
+    setError(null);
+    if (!storyFile.current && cardRef.current) storyFile.current = renderStoryFile(cardRef.current, fileName);
+    let file: File;
+    setBusy(true);
+    try {
+      file = await storyFile.current!;
+    } catch {
+      storyFile.current = null;
+      setError("Couldn't create the image. Try a screenshot instead.");
+      return;
+    } finally {
+      setBusy(false);
+    }
+    // Files only (no text/url): with extra fields iOS drops "Save Image" from the share sheet.
+    if (navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        return;
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') return; // user closed the sheet
+      }
+    }
+    // No file sharing (or activation expired): show the full-size image to press-and-hold save.
+    setSaveUrl(URL.createObjectURL(file));
   };
 
   const copyLink = async () => {
@@ -305,12 +362,22 @@ function Share({ match, onBack }: { match: Persona; onBack: () => void }) {
       </div>
 
       <div className="stack share-actions">
-        <button className="btn btn-primary btn-lg" onClick={download} disabled={busy}>
+        <button className="btn btn-primary btn-lg" onClick={touch ? downloadMobile : downloadDesktop} disabled={busy}>
           {busy ? 'Preparing image…' : 'Download for Instagram Story'}
         </button>
         <button className="btn btn-secondary btn-lg" onClick={copyLink}>{copied ? 'Link copied' : 'Copy Link'}</button>
         {error && <p className="share-error" role="alert">{error}</p>}
       </div>
+
+      {saveUrl && (
+        <div className="dialog-backdrop save-sheet" onClick={() => setSaveUrl(null)}>
+          <div className="save-sheet-body" onClick={(e) => e.stopPropagation()}>
+            <img src={saveUrl} alt={`${match.name} match card`} />
+            <p>Press and hold the image, then tap <strong>Save to Photos</strong>.</p>
+            <button className="btn btn-secondary btn-lg" onClick={() => setSaveUrl(null)}>Done</button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

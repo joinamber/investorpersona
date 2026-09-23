@@ -92,9 +92,14 @@
   display: flex; align-items: flex-start; gap: var(--space-4); text-align: left;
   background: var(--color-bg); border: 2px solid var(--color-divider); padding: var(--space-4);
   font-family: var(--font-body); font-size: 16px; line-height: 1.4; color: var(--color-text);
-  cursor: pointer;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.option:hover, .option.is-selected { border-color: var(--color-accent); background: var(--color-accent-100); }
+/* Hover only on real pointers: touch browsers (iOS Safari/Chrome) keep :hover stuck on whatever sits
+   under the last tap, which made an option on the next question look pre-selected. */
+.option.is-selected { border-color: var(--color-accent); background: var(--color-accent-100); }
+@media (hover: hover) and (pointer: fine) {
+  .option:not(:disabled):hover { border-color: var(--color-accent); background: var(--color-accent-100); }
+}
 .option:disabled { cursor: default; }
 .option-letter {
   flex: none; width: 28px; height: 28px; border: 2px solid var(--color-text);
